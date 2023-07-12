@@ -23,19 +23,3 @@ class Resource {
         ctx.drawImage(this.image, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
     }
 }
-
-function handleResources() {
-    if (frame % 500 === 0 && score < winningScore) {
-        resources.push(new Resource());
-    }
-    for (let i = 0; i < resources.length; i++) {
-        resources[i].draw();
-        if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
-            numberOfResources += resources[i].amount;
-            floatingMessages.push(new FloatingMessage('+' + resources[i].amount, resources[i].x, resources[i].y, 20, 'black'));
-            floatingMessages.push(new FloatingMessage('+' + resources[i].amount, 470, 85, 30, 'gold'));
-            resources.splice(i, 1);
-            i--;
-        }
-    }
-}

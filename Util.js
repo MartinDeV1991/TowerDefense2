@@ -35,7 +35,7 @@ function handleFloatingMessages() {
 }
 
 const restartButton = {
-    x: 900 - 130,
+    x: 1000,
     y: 10,
     width: 100,
     height: 50
@@ -46,18 +46,19 @@ function handleGameStatus() {
     ctx.fillStyle = 'black';
     ctx.font = '30px Orbitron';
     ctx.fillText('Resources: ' + numberOfResources, 300, 80);
-    ctx.fillText('Score: ' + score, 300, 40);
-    if (gameOver) {
+    ctx.fillText('Exp. points: ' + exp, 300, 40);
+    if (playerBase.health <= 0) {
         ctx.fillStyle = 'white';
         ctx.font = '60px Orbitron';
         ctx.fillText('Game Over', 170, 330);
+        gameOver = true;
     }
-    if (score > winningScore && enemies.length === 0) {
+    if (enemyBase.health <= 0) {
         ctx.fillStyle = 'white';
         ctx.font = '60px Orbitron';
-        ctx.fillText('LEVEL COMPLETE', 130, 300);
+        ctx.fillText('YOU WIN!', 130, 300);
         ctx.font = '30px Orbitron';
-        ctx.fillText('You win with ' + score + ' points!', 170, 340);
+        gameOver = true;
     }
 
     let restartButtonStroke = 'black';
@@ -69,4 +70,20 @@ function handleGameStatus() {
     ctx.fillStyle = 'rgba(4,41,117,1';
     ctx.font = '22px Orbitron';
     ctx.fillText('restart', restartButton.x + 8, restartButton.y + 33);
+
+
+    // health bar
+    ctx.fillStyle = 'red'
+    ctx.fillRect(playerBase.x, playerBase.y - 100, playerBase.width, 10)
+    
+    ctx.fillStyle = 'green'
+    ctx.fillRect(playerBase.x, playerBase.y - 100, playerBase.width * playerBase.health / playerBase.startHealth, 10)
+
+    ctx.fillStyle = 'red'
+    ctx.fillRect(enemyBase.x, enemyBase.y - 100, enemyBase.width, 10)
+    
+    ctx.fillStyle = 'green'
+    ctx.fillRect(enemyBase.x, enemyBase.y - 100, enemyBase.width * enemyBase.health / enemyBase.startHealth, 10)
+
+
 }

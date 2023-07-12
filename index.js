@@ -1,21 +1,24 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 900;
+canvas.width = 1200;
 canvas.height = 600;
 
+let beat = new Audio();
+beat.src = './AgeOfWar2.mp3';
+beat.volume = 0.01;
+
 // global variables
-const cellSize = 100;
+const cellSize = 80;
 const cellGap = 3;
 
 let numberOfResources = 300;
-let enemiesInterval = 600;
+let enemiesInterval = 400;
 let frame = 0;
 let gameOver = false;
-let score = 0;
-const winningScore = 2000;
-let chosenDefender = 1;
-let defenderCost = 0;
+let exp = 0;
+let chosenUnit = 1;
+let unitCost = 0;
 
 let gameGrid = [];
 let defenders = [];
@@ -33,61 +36,47 @@ const mouse = {
     clicked: false
 }
 
-
 // game board
 const controlsBar = {
     width: canvas.width,
     height: cellSize,
 }
-class Cell {
+class Base {
     constructor(x, y) {
         this.x = x;
         this.y = y;
         this.width = cellSize;
         this.height = cellSize;
-    }
-    draw() {
-        if (mouse.x && mouse.y && collision(this, mouse)) {
-            ctx.strokeStyle = 'black';
-            ctx.strokeRect(this.x, this.y, this.width, this.height);
-        }
+        this.health = 10000;
+        this.startHealth = this.health;
     }
 }
-function createGrid() {
-    for (let y = cellSize; y < canvas.height; y += cellSize) {
-        for (let x = cellSize; x < canvas.width; x += cellSize) {
-            gameGrid.push(new Cell(x, y));
-        }
-    }
-}
-function handleGameGrid() {
-    for (let i = 0; i < gameGrid.length; i++) {
-        gameGrid[i].draw();
-    }
-}
+
+const playerBaseX = 0;
+const playerBaseY = canvas.height - 110;
+const playerBase = new Base(playerBaseX + cellSize, playerBaseY)
+
+const enemyBaseX = canvas.width - cellSize;
+const enemyBaseY = canvas.height - 110;
+const enemyBase = new Base(enemyBaseX - cellSize, enemyBaseY)
 
 const background = new Image();
-background.src = './img/background.jpg'
-
-createGrid();
+background.src = './img/AgeOfWarBackground.png'
 
 let restartTimer = 20;
-let restartCount = 0
+let restartCount = 0;
 
 function animate() {
     if (!gameOver) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(0, 0, controlsBar.width, controlsBar.height);
-        ctx.drawImage(background, 350, 0, 700, 600, 0, 0, canvas.width, canvas.height)
+        ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 
-
-        handleGameGrid();
-        handleDefenders();
-        handleResources();
-        handleProjectiles();
-        chooseDefender();
+        handleCannons();
+        chooseUnit();
+        handleUnits();
         handleEnemies();
+        handleCollisions();
+        handleProjectiles();
         handleGameStatus();
         handleFloatingMessages()
         frame++;
@@ -111,48 +100,32 @@ function collision(first, second) {
     }
 }
 
+function collisionRange(first, second, range) {
+    if (Math.abs(first.x - second.x) < range) {
+        return true;
+    }
+}
+
+
 function restart() {
     numberOfResources = 300;
     enemiesInterval = 600;
     frame = 0;
     gameOver = false;
-    score = 0;
-    chosenDefender = 1;
+    exp = 0;
+    level = 1;
+    chosenUnit = 1;
     defenders = [];
     enemies = [];
     enemyPositions = [];
     projectiles = [];
     resources = [];
+    cannons = [];
+    enemyCannon = false;
+    playerCannon = false;
+    enemyBase.health = enemyBase.startHealth;
+    playerBase.health = playerBase.startHealth;
 }
-
-
-canvas.addEventListener('click', function () {
-    const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
-    const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
-    if (gridPositionY < cellSize) return;
-    if (gridPositionX < cellSize) return;
-    for (let i = 0; i < defenders.length; i++) {
-        if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) {
-            return;
-        }
-    }
-    if (chosenDefender === 1) {
-        defenderCost = 100;
-    } else if (chosenDefender === 2) {
-        defenderCost = 150;
-    } else if (chosenDefender === 3) {
-        defenderCost = 30;
-    }
-
-    if (numberOfResources >= defenderCost) {
-        defenders.push(new Defender(gridPositionX, gridPositionY, chosenDefender));
-        numberOfResources -= defenderCost;
-        floatingMessages.push(new FloatingMessage('-' + defenderCost, gridPositionX + cellSize, gridPositionY + 20, 20, 'black'));
-        floatingMessages.push(new FloatingMessage('-' + defenderCost, 470, 85, 30, 'red'));
-    } else {
-        floatingMessages.push(new FloatingMessage('need more resources', mouse.x, mouse.y, 15, 'blue'))
-    }
-});
 
 canvas.addEventListener('mousedown', function () {
     mouse.clicked = true;
@@ -160,7 +133,6 @@ canvas.addEventListener('mousedown', function () {
 canvas.addEventListener('mouseup', function () {
     mouse.clicked = false;
 })
-
 
 let canvasPosition = canvas.getBoundingClientRect();
 canvas.addEventListener('mousemove', function (e) {
@@ -176,3 +148,8 @@ window.addEventListener('resize', function () {
     canvasPosition = canvas.getBoundingClientRect();
 })
 
+let volume = document.getElementById('volume-slider');
+volume.addEventListener("change", function (e) {
+    beat.volume = e.currentTarget.value / 100;
+    beat.play()
+})

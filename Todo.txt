@@ -1,0 +1,23 @@
+
+Remove grid
+Create a unit spawn field
+Create units when card is clicked
+Change unit movement so that they move to the right
+Stop units when they collide
+Create base with health and make it attackle by units
+Gain money when units are defeated
+Create level up button that consumes exp points and changes the unit set
+
+Create sprites for 3 ages (4 units per age)
+Add attack sprites for units when they stop (melee)
+Add projectiles for ranged units + collision between unit/base and projectile
+Add special power button that clears the field of enemies
+Give enemy a more realistic economy (let them earn money as they kill players units)
+Adjust unit stats so that game is balanced
+
+Add music
+
+
+
+https://www.seekpng.com/ipng/u2w7q8y3y3a9w7i1_click-to-view-full-size-age-of-empire/
+
