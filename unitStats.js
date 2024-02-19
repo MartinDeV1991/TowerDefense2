@@ -60,9 +60,6 @@ djinn_attack_R.src = './img/djinn_attack_R.png'
 const djinn_idle_R = new Image();
 djinn_idle_R.src = './img/djinn_idle_R.png'
 
-const magic_attack_R = new Image();
-magic_attack_R.src = './img/magic_2.png'
-
 const unitStats = [];
 
 const unitStats1 = {

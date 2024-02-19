@@ -27,6 +27,9 @@ let enemyPositions = [];
 let projectiles = [];
 let resources = [];
 
+let playing = false;
+let firstFrame = true;
+
 // mouse
 const mouse = {
     x: 10,
@@ -68,6 +71,11 @@ let restartCount = 0;
 
 function animate() {
     if (!gameOver) {
+        requestAnimationFrame(animate);
+        if (!playing && !firstFrame) return;
+        else firstFrame = false;
+        
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 
@@ -87,9 +95,10 @@ function animate() {
         restartCount = 0;
     }
     restartCount++;
-    requestAnimationFrame(animate);
 }
-animate(0);
+window.addEventListener('load', function () {
+    animate(0);
+});
 
 function collision(first, second) {
     if (!(first.x > second.x + second.width ||
@@ -127,7 +136,15 @@ function restart() {
     playerBase.health = playerBase.startHealth;
 }
 
+window.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() === 'p') playing = !playing;
+    else {
+        playing = true;
+    }
+});
+
 canvas.addEventListener('mousedown', function () {
+    playing = true;
     mouse.clicked = true;
 })
 canvas.addEventListener('mouseup', function () {
